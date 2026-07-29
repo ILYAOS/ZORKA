@@ -2,83 +2,91 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>MAX: данные пользователя</title>
-    <!-- Официальная библиотека MAX -->
+    <title>Зоренька — MAX MiniApp</title>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
-      body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
-      .container { max-width: 400px; margin: 0 auto; background: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-      h2 { margin-top: 0; color: #333; }
-      #user-info { padding: 12px; background: #eef2f7; border: 1px solid #d9e2ec; border-radius: 6px; color: #2c3e50; min-height: 24px; margin-top: 16px; white-space: pre-wrap; }
-      button { padding: 12px 20px; font-size: 14px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 6px; }
-      button:hover { background-color: #0056b3; }
-      button:disabled { background-color: #ccc; cursor: not-allowed; }
-      .error { color: #c0392b; }
+      body { font-family: Arial, sans-serif; padding: 20px; }
+      .buttons-container { display: flex; gap: 12px; flex-direction: column; }
+      button {
+        padding: 14px 20px;
+        font-size: 16px;
+        background-color: #ff9500; /* облепиховый цвет */
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      #user-info { margin-top: 20px; font-weight: bold; }
     </style>
   </head>
   <body>
-    <script src="https://st.max.ru/js/max-web-app.js"></script>
-<script>
-  window.WebApp.ready();
+    <h2>Зоренька</h2>
 
-  const user = window.WebApp.initDataUnsafe?.user;
-  if (user) {
-    document.getElementById('user-info').textContent =
-      'Пользователь: ${user.first_name}, ID: ${user.id}';
-  } else {
-    document.getElementById('user-info').textContent = 'Данные пользователя недоступны';
-  }
-</script>
-
-<div id="user-info"></div>
-
-    <div class="container">
-      <h2>Данные пользователя</h2>
-      <button id="get-user-btn">О пользователе</button>
-      <div id="user-info" class="loading">Ожидание контекста MAX…</div>
-      <p style="margin-top:12px; font-size:12px; color:#888;">
-        Важно: запускать нужно из интерфейса MAX. Прямая ссылка в браузере не работает.
-      </p>
+    <div class="buttons-container">
+      <button id="btn-menu">Меню</button>
+      <button id="btn-phones">Наши номера</button>
+      <button id="btn-sauna">Сауна</button>
+      <button id="btn-events">Анонс мероприятий</button>
+      <button id="btn-user">О пользователе</button>
     </div>
 
+    <div id="user-info"></div>
+
     <script>
-      const infoBox = document.getElementById('user-info');
-      const btn = document.getElementById('get-user-btn');
-
-      // Главная проверка: есть ли MaxBridge
-      if (typeof MaxBridge === 'undefined') {
-        const msg = 'Ошибка: MaxBridge не определён.\n\nЭто значит, что приложение запущено НЕ из среды MAX.\nОткройте его через конструктор/чат MAX, а не по прямой ссылке в браузере.';
-        infoBox.textContent = msg;
-        infoBox.className = 'error';
-        btn.disabled = true;
-        console.error(msg);
+      if (window.WebApp) {
+        window.WebApp.ready();
+        // Опционально: развернуть на всю высоту
+        // window.WebApp.expand();
       } else {
-        // Если мы внутри MAX — всё хорошо
-        const bridge = new MaxBridge();
-
-        btn.addEventListener('click', () => {
-          infoBox.textContent = 'Загрузка данных…';
-          infoBox.className = '';
-
-          bridge.ready()
-            .then(() => bridge.getUserInfo())
-            .then(userInfo => {
-              if (!userInfo) {
-                infoBox.textContent = 'Данные пользователя не получены.';
-                return;
-              }
-              let text = '';
-              text += userInfo.name ? `Имя: ${userInfo.name}\n` : 'Имя: не указано\n';
-              text += userInfo.id ? `ID: ${userInfo.id}` : 'ID: не указан';
-              infoBox.textContent = text;
-            })
-            .catch(err => {
-              console.error(err);
-              infoBox.textContent = `Ошибка: ${err.message || String(err)}`;
-              infoBox.className = 'error';
-            });
-        });
+        document.body.textContent = 'Приложение должно быть запущено внутри MAX.';
+        return;
       }
+
+      function getUserData() {
+        const initData = window.WebApp?.initData;
+        if (!initData) return null;
+
+        const params = new URLSearchParams(initData);
+        const userStr = params.get('user');
+        if (!userStr) return null;
+
+        try {
+          return JSON.parse(userStr);
+        } catch (e) {
+          console.error('Ошибка парсинга user', e);
+          return null;
+        }
+      }
+
+      // Кнопка «О пользователе»
+      document.getElementById('btn-user').addEventListener('click', () => {
+        const user = getUserData();
+        const el = document.getElementById('user-info');
+        if (user) {
+          el.textContent = `ID: ${user.id}, Имя: ${user.first_name || 'Не указано'}`;
+        } else {
+          el.textContent = 'Данные пользователя недоступны';
+        }
+      });
+
+      // Пример: открытие файла по кнопке (Яндекс Диск)
+      const links = {
+        'btn-menu': 'https://disk.yandex.ru/i/IYNKVFUQ-UUGPQ',
+        'btn-phones': 'ССЫЛКА_НА_ФАЙЛ_НОМЕРА',
+        'btn-sauna': 'ССЫЛКА_НА_ФАЙЛ_САУНА',
+        'btn-events': 'ССЫЛКА_НА_events.csv'
+      };
+
+      Object.keys(links).forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.addEventListener('click', () => {
+            const url = links[id];
+            if (url) {
+              window.WebApp.openLink(url); // откроет во внешнем браузере
+            }
+          });
+        }
+      });
     </script>
   </body>
 </html>
