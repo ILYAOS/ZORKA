@@ -2,85 +2,67 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>Зоренька</title>
-    <!-- MAX Bridge (работает только внутри MAX) -->
+    <title>MAX: данные пользователя</title>
+    <!-- Официальная библиотека MAX -->
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
-      body { font-family: Arial, sans-serif; padding: 20px; }
-      .buttons-container { display: flex; gap: 12px; flex-direction: column; }
-      button {
-        padding: 14px 20px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        background-color: #007bff;
-        color: white;
-      }
+      body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+      .container { max-width: 400px; margin: 0 auto; background: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+      h2 { margin-top: 0; color: #333; }
+      #user-info { padding: 12px; background: #eef2f7; border: 1px solid #d9e2ec; border-radius: 6px; color: #2c3e50; min-height: 24px; margin-top: 16px; white-space: pre-wrap; }
+      button { padding: 12px 20px; font-size: 14px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 6px; }
       button:hover { background-color: #0056b3; }
-      #output { margin-top: 20px; min-height: 60px; color: #333; }
-      #user-info { margin-bottom: 15px; color: #555; }
+      button:disabled { background-color: #ccc; cursor: not-allowed; }
+      .error { color: #c0392b; }
     </style>
   </head>
   <body>
-    <script src="https://st.max.ru/js/max-web-app.js"></script>
-    <h2>Меню бота «Зоренька»</h2>
-    <div id="user-info">Загрузка контекста MAX…</div>
-    <div class="buttons-container">
-      <button onclick="handleAction('view_events')">Просмотр запланированных событий</button>
-      <button onclick="handleAction('reports')">Отчёты</button>
-      <button onclick="handleAction('capabilities')">Что умею</button>
+    <div class="container">
+      <h2>Данные пользователя</h2>
+      <button id="get-user-btn">О пользователе</button>
+      <div id="user-info" class="loading">Ожидание контекста MAX…</div>
+      <p style="margin-top:12px; font-size:12px; color:#888;">
+        Важно: запускать нужно из интерфейса MAX. Прямая ссылка в браузере не работает.
+      </p>
     </div>
-    <div id="output"></div>
 
     <script>
-      // Относительная ссылка: файл лежит рядом с index.html на GitHub Pages
-      const EVENTS_CSV_URL = 'events.csv';
-      const CAPABILITIES_LINK = 'https://disk.yandex.ru/i/vZnEmDqQd2bECw';
+      const infoBox = document.getElementById('user-info');
+      const btn = document.getElementById('get-user-btn');
 
-      // Инициализация MAX Bridge
-      document.addEventListener('DOMContentLoaded', () => {
-        if (window.MaxApp) {
-          MaxApp.init()
-            .then(app => {
-              const userId = app.userId;
-              const userName = app.userName || 'Пользователь';
-              document.getElementById('user-info').textContent =
-                `Пользователь: ${userName} (ID: ${userId})`;
+      // Главная проверка: есть ли MaxBridge
+      if (typeof MaxBridge === 'undefined') {
+        const msg = 'Ошибка: MaxBridge не определён.\n\nЭто значит, что приложение запущено НЕ из среды MAX.\nОткройте его через конструктор/чат MAX, а не по прямой ссылке в браузере.';
+        infoBox.textContent = msg;
+        infoBox.className = 'error';
+        btn.disabled = true;
+        console.error(msg);
+      } else {
+        // Если мы внутри MAX — всё хорошо
+        const bridge = new MaxBridge();
+
+        btn.addEventListener('click', () => {
+          infoBox.textContent = 'Загрузка данных…';
+          infoBox.className = '';
+
+          bridge.ready()
+            .then(() => bridge.getUserInfo())
+            .then(userInfo => {
+              if (!userInfo) {
+                infoBox.textContent = 'Данные пользователя не получены.';
+                return;
+              }
+              let text = '';
+              text += userInfo.name ? `Имя: ${userInfo.name}\n` : 'Имя: не указано\n';
+              text += userInfo.id ? `ID: ${userInfo.id}` : 'ID: не указан';
+              infoBox.textContent = text;
             })
             .catch(err => {
-              console.error('MAX init error:', err);
-              document.getElementById('user-info').textContent =
-                'Не удалось получить данные пользователя (приложение не запущено в MAX?)';
+              console.error(err);
+              infoBox.textContent = `Ошибка: ${err.message || String(err)}`;
+              infoBox.className = 'error';
             });
-        } else {
-          document.getElementById('user-info').textContent =
-            'MAX Bridge не обнаружен (проверь, что страница открыта внутри MAX)';
-        }
-      });
-
-      function handleAction(action) {
-        const output = document.getElementById('output');
-        output.innerHTML = '';
-
-        if (action === 'view_events') {
-          output.textContent = 'Начинается загрузка файла events.csv…';
-          downloadFile(EVENTS_CSV_URL, 'events.csv');
-        } else if (action === 'reports') {
-          output.textContent = 'Формирую отчёты… (в разработке)';
-        } else if (action === 'capabilities') {
-          window.open(CAPABILITIES_LINK, '_blank');
-          output.textContent = 'Открываю описание возможностей…';
-        }
-      }
-
-      function downloadFile(url, filename) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        });
       }
     </script>
   </body>
