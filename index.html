@@ -25,7 +25,9 @@
     const user = window.WebApp.initDataUnsafe.user;
       
   console.log(user.first_Name, user.id,user.username);
-     
+     const el = document.getElementById('user-info');
+    el.textContent = 'ID: ${user.id}, Имя: ${user.first_name'
+      
       </script>
     <div class="buttons-container">
       <button id="btn-menu">Меню</button>
