@@ -20,7 +20,12 @@
   </head>
   <body>
     <h2>Зоренька</h2>
-
+     <script src="https://st.max.ru/js/max-web-app.js"></script>
+    <script>  window.WebApp.ready() 
+    const user = window.WebApp.initDataUnsafe.user;
+      
+  console.log(user.firstName, user.id);
+      </script>
     <div class="buttons-container">
       <button id="btn-menu">Меню</button>
       <button id="btn-phones">Наши номера</button>
