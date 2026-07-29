@@ -41,6 +41,8 @@
       // Выводим на форму вместо заголовков с текстом
       document.getElementById('out-gg').textContent = ggg;
       document.getElementById('out-gggg').textContent = gggg;
+       const el = document.getElementById('user-id-full');
+       el.textContent = `ID пользователя: ${ggg}`;
       // Можно вывести и username, если нужно
     } else {
       console.warn('Данные пользователя недоступны — возможно, приложение запущено не в MAX');
@@ -54,12 +56,6 @@
 
 <h2 id="user-id-full"></h2>
     
-<script>
-  
-   const el = document.getElementById('user-id-full');
-   el.textContent = `ID пользователя: ${ggg}`; // подстановка в JS
-    
-</script>
     
 <p id="out-gg"></p>
 
