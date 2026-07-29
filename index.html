@@ -21,6 +21,7 @@
   <body>
     <h2>Зоренька</h2>
     <h2 id="user-id-full"></h2>
+    <h2 id="user-id-name"></h2>
      <script src="https://st.max.ru/js/max-web-app.js"></script>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
 <script>
@@ -35,14 +36,17 @@
     if (user) {
       const ggg = user.id;                 // ID пользователя
       const gggg = user.firstName;        // Имя (без подчёркивания)
+      const gg = user.first_name; 
       // hash не берём из user — он в initData и проверяется на сервере
 
-      console.log(gggg, ggg, user.username || '—',user.language_code);
+      console.log(gggg, ggg, user.username || '—',user.language_code,user.first_name);
 
       // Выводим на форму вместо заголовков с текстом
       
        const el = document.getElementById('user-id-full');
        el.textContent = `ID пользователя: ${ggg}`;
+      const e2 = document.getElementById('user-id-name');
+       e2.textContent = `ID пользователя: ${gg}`;
       // Можно вывести и username, если нужно
     } else {
       console.warn('Данные пользователя недоступны — возможно, приложение запущено не в MAX');
