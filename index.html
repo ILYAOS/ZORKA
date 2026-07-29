@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Сайт с красным фоном</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        background-color: #ff0000; /* красный фон */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+      }
+      button {
+        padding: 15px 30px;
+        font-size: 18px;
+        background-color: white;
+        color: #ff0000;
+        border: none;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: transform 0.2s, background-color 0.2s;
+      }
+      button:hover {
+        background-color: #ffe0e0;
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <button id="program-btn">О программе</button>
+
+    <script>
+      document.getElementById('program-btn').addEventListener('click', () => {
+        alert('Здесь будет информация о программе!');
+      });
+    </script>
+  </body>
+</html>
