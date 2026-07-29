@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>Мини‑приложение MAX: данные пользователя</title>
+    <title>MAX: данные пользователя</title>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
       body {
@@ -18,10 +18,7 @@
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
-      h2 {
-        margin-top: 0;
-        color: #333;
-      }
+      h2 { margin-top: 0; color: #333; }
       #user-info {
         padding: 12px;
         background: #eef2f7;
@@ -30,6 +27,7 @@
         color: #2c3e50;
         min-height: 24px;
         margin-top: 16px;
+        white-space: pre-wrap; /* чтобы переносы строк отображались */
       }
       button {
         padding: 12px 20px;
@@ -40,9 +38,7 @@
         border: none;
         border-radius: 6px;
       }
-      button:hover {
-        background-color: #0056b3;
-      }
+      button:hover { background-color: #0056b3; }
       .loading { color: #7f8c8d; }
       .error { color: #c0392b; }
     </style>
@@ -52,42 +48,52 @@
       <h2>Данные пользователя</h2>
       <button id="get-user-btn">О пользователе</button>
       <div id="user-info" class="loading">Нажмите кнопку, чтобы получить данные</div>
+      <p style="margin-top:12px; font-size:12px; color:#888;">
+        Проверьте консоль браузера (F12) — туда выводятся технические ошибки.
+      </p>
     </div>
 
     <script>
       const bridge = new MaxBridge();
+      const infoBox = document.getElementById('user-info');
 
       document.getElementById('get-user-btn').addEventListener('click', () => {
-        const container = document.getElementById('user-info');
-        container.textContent = 'Загрузка данных…';
-        container.className = 'loading';
+        infoBox.textContent = 'Загрузка данных…';
+        infoBox.className = 'loading';
 
-        bridge.ready().then(() => {
-          return bridge.getUserInfo();
-        }).then((userInfo) => {
-          if (userInfo) {
+        // Сначала ждём готовности моста
+        bridge.ready()
+          .then(() => {
+            console.log('MAX Bridge готов');
+            return bridge.getUserInfo();
+          })
+          .then((userInfo) => {
+            console.log('Получены данные:', userInfo);
+            if (!userInfo) {
+              infoBox.textContent = 'Данные пользователя не получены (null).';
+              infoBox.className = 'error';
+              return;
+            }
+
             let text = '';
             if (userInfo.name) {
               text += `Имя: ${userInfo.name}\n`;
             } else {
-              text += 'Имя не указано\n';
+              text += 'Имя: не указано\n';
             }
             if (userInfo.id) {
               text += `ID: ${userInfo.id}`;
             } else {
-              text += 'ID не указан';
+              text += 'ID: не указан';
             }
-            container.textContent = text;
-            container.className = '';
-          } else {
-            container.textContent = 'Не удалось получить данные пользователя.';
-            container.className = 'error';
-          }
-        }).catch((err) => {
-          console.error(err);
-          container.textContent = 'Ошибка получения данных.';
-          container.className = 'error';
-        });
+            infoBox.textContent = text;
+            infoBox.className = '';
+          })
+          .catch((err) => {
+            console.error('Ошибка получения данных:', err);
+            infoBox.textContent = `Ошибка: ${err.message || String(err)}`;
+            infoBox.className = 'error';
+          });
       });
     </script>
   </body>
