@@ -19,10 +19,18 @@
   <body>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
 <script>
-          if (window.WebApp) {
-          window.WebApp.ready();
-            }
+  window.WebApp.ready();
+
+  const user = window.WebApp.initDataUnsafe?.user;
+  if (user) {
+    document.getElementById('user-info').textContent =
+      `Пользователь: ${user.first_name}, ID: ${user.id}`;
+  } else {
+    document.getElementById('user-info').textContent = 'Данные пользователя недоступны';
+  }
 </script>
+
+<div id="user-info"></div>
 
     <div class="container">
       <h2>Данные пользователя</h2>
