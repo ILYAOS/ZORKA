@@ -24,7 +24,7 @@
   const user = window.WebApp.initDataUnsafe?.user;
   if (user) {
     document.getElementById('user-info').textContent =
-      `Пользователь: ${user.first_name}, ID: ${user.id}`;
+      'Пользователь: ${user.first_name}, ID: ${user.id}';
   } else {
     document.getElementById('user-info').textContent = 'Данные пользователя недоступны';
   }
