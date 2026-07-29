@@ -36,7 +36,7 @@
       const gggg = user.firstName;        // Имя (без подчёркивания)
       // hash не берём из user — он в initData и проверяется на сервере
 
-      console.log(gggg, ggg, user.username || '—',chatM.id,chatM.type,user.language_code);
+      console.log(gggg, ggg, user.username || '—',user.language_code);
 
       // Выводим на форму вместо заголовков с текстом
       document.getElementById('out-gg').textContent = ggg;
