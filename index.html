@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Зоренька</title>
-    <!-- Подключаем MAX Bridge -->
+    <!-- MAX Bridge обязательно должен быть подключён -->
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
       body { font-family: Arial, sans-serif; padding: 20px; }
@@ -19,11 +19,12 @@
       }
       button:hover { background-color: #0056b3; }
       #output { margin-top: 20px; min-height: 60px; color: #333; }
+      #user-info { margin-bottom: 15px; color: #555; }
     </style>
   </head>
   <body>
     <h2>Меню бота «Зоренька»</h2>
-    <div id="user-info" style="margin-bottom: 15px; color: #555;"></div>
+    <div id="user-info">Загрузка контекста MAX…</div>
     <div class="buttons-container">
       <button onclick="handleAction('view_events')">Просмотр запланированных событий</button>
       <button onclick="handleAction('reports')">Отчёты</button>
@@ -32,26 +33,27 @@
     <div id="output"></div>
 
     <script>
-      // Ссылка на файл events.csv (должна быть прямой ссылкой на скачивание)
-      const EVENTS_CSV_URL = 'https://disk.yandex.ru/i/C2k95NK2ThfsAg'; // ⚠️ Замени на прямую ссылку на скачивание или свой хостинг
-
-      // Ссылка для кнопки «Что умею»
+      const EVENTS_CSV_URL = 'https://disk.yandex.ru/i/C2k95NK2ThfsAg'; // ⚠️ Прямая ссылка на скачивание (см. ниже)
       const CAPABILITIES_LINK = 'https://disk.yandex.ru/i/vZnEmDqQd2bECw';
 
       // Инициализация MAX Bridge
       document.addEventListener('DOMContentLoaded', () => {
         if (window.MaxApp) {
-          MaxApp.init().then(app => {
-            const userId = app.userId;
-            const userName = app.userName || 'Пользователь';
-            document.getElementById('user-info').textContent =
-              `Пользователь: ${userName} (ID: ${userId})`;
-          }).catch(err => {
-            console.error('MAX init error:', err);
-            document.getElementById('user-info').textContent = 'Не удалось получить данные пользователя (работает вне MAX?)';
-          });
+          MaxApp.init()
+            .then(app => {
+              const userId = app.userId;
+              const userName = app.userName || 'Пользователь';
+              document.getElementById('user-info').textContent =
+                `Пользователь: ${userName} (ID: ${userId})`;
+            })
+            .catch(err => {
+              console.error('MAX init error:', err);
+              document.getElementById('user-info').textContent =
+                'Не удалось получить данные пользователя (приложение не запущено в MAX?)';
+            });
         } else {
-          document.getElementById('user-info').textContent = 'MAX Bridge не загружен (тестирование вне MAX)';
+          document.getElementById('user-info').textContent =
+            'MAX Bridge не обнаружен (проверь, что страница открыта внутри MAX)';
         }
       });
 
@@ -60,9 +62,8 @@
         output.innerHTML = '';
 
         if (action === 'view_events') {
-          // Открываем файл для скачивания
-          downloadFile(EVENTS_CSV_URL, 'events.csv');
           output.textContent = 'Начинается загрузка файла events.csv…';
+          downloadFile(EVENTS_CSV_URL, 'events.csv');
         } else if (action === 'reports') {
           output.textContent = 'Формирую отчёты… (в разработке)';
         } else if (action === 'capabilities') {
