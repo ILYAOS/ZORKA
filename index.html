@@ -21,20 +21,40 @@
   <body>
     <h2>Зоренька</h2>
      <script src="https://st.max.ru/js/max-web-app.js"></script>
-    <script>  window.WebApp.ready() 
-    const user = window.WebApp.initDataUnsafe.user;
-      
-  console.log(user.first_Name, user.id,user.username);
-     const ggg = user.id;
-     const gggg=user.first_Name$
-      const gg=user.hash;
-     
+    <script src="https://st.max.ru/js/max-web-app.js"></script>
+<script>
+  if (window.WebApp) {
+    window.WebApp.ready();
+
+    // Проверяем, есть ли данные
+    const initDataUnsafe = window.WebApp.initDataUnsafe;
+    const user = initDataUnsafe?.user;
+
+    if (user) {
+      const ggg = user.id;                 // ID пользователя
+      const gggg = user.firstName;        // Имя (без подчёркивания)
+      // hash не берём из user — он в initData и проверяется на сервере
+
+      console.log(gggg, ggg, user.username || '—');
+
+      // Выводим на форму вместо заголовков с текстом
+      document.getElementById('out-gg').textContent = ggg;
+      document.getElementById('out-gggg').textContent = gggg;
+      // Можно вывести и username, если нужно
+    } else {
+      console.warn('Данные пользователя недоступны — возможно, приложение запущено не в MAX');
+    }
+  } else {
+    console.error('WebApp не определён. Проверьте, что страница открыта в MAX и скрипт загружен.');
+  }
+</script>
+
+<h2>ID пользователя:</h2>
+<p id="out-gg"></p>
+
+<h2>Имя пользователя:</h2>
+<p id="out-gggg"></p>
     
-      
-      </script>
-    <h2>gg</h2>
-      <h2>gggg</h2>
-      <h2>ggg</h2>
     <div class="buttons-container">
       <button id="btn-menu">Меню</button>
       <button id="btn-phones">Наши номера</button>
