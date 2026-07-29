@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>MAX: данные пользователя</title>
+    <!-- Скрипт обязательно должен быть здесь -->
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
       body {
@@ -27,7 +28,7 @@
         color: #2c3e50;
         min-height: 24px;
         margin-top: 16px;
-        white-space: pre-wrap; /* чтобы переносы строк отображались */
+        white-space: pre-wrap;
       }
       button {
         padding: 12px 20px;
@@ -39,6 +40,7 @@
         border-radius: 6px;
       }
       button:hover { background-color: #0056b3; }
+      button:disabled { background-color: #ccc; cursor: not-allowed; }
       .loading { color: #7f8c8d; }
       .error { color: #c0392b; }
     </style>
@@ -47,54 +49,56 @@
     <div class="container">
       <h2>Данные пользователя</h2>
       <button id="get-user-btn">О пользователе</button>
-      <div id="user-info" class="loading">Нажмите кнопку, чтобы получить данные</div>
+      <div id="user-info" class="loading">Ожидание контекста MAX…</div>
       <p style="margin-top:12px; font-size:12px; color:#888;">
-        Проверьте консоль браузера (F12) — туда выводятся технические ошибки.
+        Важно: запускать нужно из интерфейса MAX, не в браузере напрямую.
       </p>
     </div>
 
     <script>
-      const bridge = new MaxBridge();
       const infoBox = document.getElementById('user-info');
+      const btn = document.getElementById('get-user-btn');
 
-      document.getElementById('get-user-btn').addEventListener('click', () => {
-        infoBox.textContent = 'Загрузка данных…';
-        infoBox.className = 'loading';
+      // Проверка: загружен ли MaxBridge
+      if (typeof MaxBridge === 'undefined') {
+        infoBox.textContent = 'Ошибка: MaxBridge не загружен. Приложение нужно запускать из MAX.';
+        infoBox.className = 'error';
+        btn.disabled = true;
+        console.error('MaxBridge не определён. Проверьте, что страница открыта из MAX.');
+      } else {
+        const bridge = new MaxBridge();
 
-        // Сначала ждём готовности моста
-        bridge.ready()
-          .then(() => {
-            console.log('MAX Bridge готов');
-            return bridge.getUserInfo();
-          })
-          .then((userInfo) => {
-            console.log('Получены данные:', userInfo);
-            if (!userInfo) {
-              infoBox.textContent = 'Данные пользователя не получены (null).';
+        btn.addEventListener('click', () => {
+          infoBox.textContent = 'Загрузка данных…';
+          infoBox.className = 'loading';
+
+          bridge.ready()
+            .then(() => {
+              console.log('MAX Bridge готов');
+              return bridge.getUserInfo();
+            })
+            .then((userInfo) => {
+              console.log('Данные пользователя:', userInfo);
+              if (!userInfo) {
+                infoBox.textContent = 'Данные пользователя не получены.';
+                infoBox.className = 'error';
+                return;
+              }
+
+              let text = '';
+              text += userInfo.name ? `Имя: ${userInfo.name}\n` : 'Имя: не указано\n';
+              text += userInfo.id ? `ID: ${userInfo.id}` : 'ID: не указан';
+
+              infoBox.textContent = text;
+              infoBox.className = '';
+            })
+            .catch((err) => {
+              console.error('Ошибка получения данных:', err);
+              infoBox.textContent = `Ошибка: ${err.message || String(err)}`;
               infoBox.className = 'error';
-              return;
-            }
-
-            let text = '';
-            if (userInfo.name) {
-              text += `Имя: ${userInfo.name}\n`;
-            } else {
-              text += 'Имя: не указано\n';
-            }
-            if (userInfo.id) {
-              text += `ID: ${userInfo.id}`;
-            } else {
-              text += 'ID: не указан';
-            }
-            infoBox.textContent = text;
-            infoBox.className = '';
-          })
-          .catch((err) => {
-            console.error('Ошибка получения данных:', err);
-            infoBox.textContent = `Ошибка: ${err.message || String(err)}`;
-            infoBox.className = 'error';
-          });
-      });
+            });
+        });
+      }
     </script>
   </body>
 </html>
