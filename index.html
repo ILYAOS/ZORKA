@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <title>Зоренька</title>
+    <!-- Подключаем MAX Bridge -->
+    <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
       body { font-family: Arial, sans-serif; padding: 20px; }
       .buttons-container { display: flex; gap: 12px; flex-direction: column; }
@@ -16,14 +18,12 @@
         color: white;
       }
       button:hover { background-color: #0056b3; }
-      #output { margin-top: 20px; min-height: 60px; }
-      table { border-collapse: collapse; width: 100%; }
-      th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
-      th { background-color: #f5f5f5; }
+      #output { margin-top: 20px; min-height: 60px; color: #333; }
     </style>
   </head>
   <body>
-    <h2>Меню бота</h2>
+    <h2>Меню бота «Зоренька»</h2>
+    <div id="user-info" style="margin-bottom: 15px; color: #555;"></div>
     <div class="buttons-container">
       <button onclick="handleAction('view_events')">Просмотр запланированных событий</button>
       <button onclick="handleAction('reports')">Отчёты</button>
@@ -32,76 +32,52 @@
     <div id="output"></div>
 
     <script>
-      // Прямая ссылка на CSV (должна быть ссылкой на скачивание, не на просмотр)
-      const EVENTS_CSV_URL = 'https://disk.yandex.ru/i/C2k95NK2ThfsAg';
+      // Ссылка на файл events.csv (должна быть прямой ссылкой на скачивание)
+      const EVENTS_CSV_URL = 'https://disk.yandex.ru/i/C2k95NK2ThfsAg'; // ⚠️ Замени на прямую ссылку на скачивание или свой хостинг
 
-      // Ссылка для кнопки «Что умею» (страница предпросмотра)
+      // Ссылка для кнопки «Что умею»
       const CAPABILITIES_LINK = 'https://disk.yandex.ru/i/vZnEmDqQd2bECw';
+
+      // Инициализация MAX Bridge
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.MaxApp) {
+          MaxApp.init().then(app => {
+            const userId = app.userId;
+            const userName = app.userName || 'Пользователь';
+            document.getElementById('user-info').textContent =
+              `Пользователь: ${userName} (ID: ${userId})`;
+          }).catch(err => {
+            console.error('MAX init error:', err);
+            document.getElementById('user-info').textContent = 'Не удалось получить данные пользователя (работает вне MAX?)';
+          });
+        } else {
+          document.getElementById('user-info').textContent = 'MAX Bridge не загружен (тестирование вне MAX)';
+        }
+      });
 
       function handleAction(action) {
         const output = document.getElementById('output');
         output.innerHTML = '';
 
         if (action === 'view_events') {
-          output.textContent = 'Загрузка событий…';
-          fetchEvents();
+          // Открываем файл для скачивания
+          downloadFile(EVENTS_CSV_URL, 'events.csv');
+          output.textContent = 'Начинается загрузка файла events.csv…';
         } else if (action === 'reports') {
           output.textContent = 'Формирую отчёты… (в разработке)';
         } else if (action === 'capabilities') {
-          // Открываем ссылку в новой вкладке
           window.open(CAPABILITIES_LINK, '_blank');
           output.textContent = 'Открываю описание возможностей…';
         }
       }
 
-      async function fetchEvents() {
-        const output = document.getElementById('output');
-        try {
-          const response = await fetch(EVENTS_CSV_URL);
-          if (!response.ok) throw new Error('Не удалось загрузить файл');
-          const csvText = await response.text();
-          const table = parseCSVToTable(csvText, ';');
-          if (table) {
-            output.appendChild(table);
-          } else {
-            output.textContent = 'Файл пуст или некорректен.';
-          }
-        } catch (err) {
-          output.textContent = 'Ошибка: ' + err.message;
-        }
-      }
-
-      function parseCSVToTable(csvText, delimiter) {
-        const lines = csvText.split(/\r?\n/).filter(l => l.trim() !== '');
-        if (lines.length === 0) return null;
-
-        const table = document.createElement('table');
-        const thead = document.createElement('thead');
-        const tbody = document.createElement('tbody');
-
-        const headers = lines[0].split(delimiter).map(h => h.trim());
-        const headerRow = document.createElement('tr');
-        headers.forEach(h => {
-          const th = document.createElement('th');
-          th.textContent = h;
-          headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
-        for (let i = 1; i < lines.length; i++) {
-          const cells = lines[i].split(delimiter).map(c => c.trim());
-          const row = document.createElement('tr');
-          cells.forEach(c => {
-            const td = document.createElement('td');
-            td.textContent = c;
-            row.appendChild(td);
-          });
-          tbody.appendChild(row);
-        }
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        return table;
+      function downloadFile(url, filename) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
     </script>
   </body>
