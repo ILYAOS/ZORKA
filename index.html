@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>Мини‑приложение MAX: имя пользователя</title>
+    <title>Мини‑приложение MAX: данные пользователя</title>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
       body {
@@ -29,6 +29,19 @@
         border-radius: 6px;
         color: #2c3e50;
         min-height: 24px;
+        margin-top: 16px;
+      }
+      button {
+        padding: 12px 20px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+      }
+      button:hover {
+        background-color: #0056b3;
       }
       .loading { color: #7f8c8d; }
       .error { color: #c0392b; }
@@ -36,24 +49,35 @@
   </head>
   <body>
     <div class="container">
-      <h2>Пользователь</h2>
-      <div id="user-info" class="loading">Загрузка данных пользователя…</div>
+      <h2>Данные пользователя</h2>
+      <button id="get-user-btn">О пользователе</button>
+      <div id="user-info" class="loading">Нажмите кнопку, чтобы получить данные</div>
     </div>
 
     <script>
-      // Инициализация MAX Bridge
       const bridge = new MaxBridge();
 
-      bridge.ready().then(() => {
-        // Получаем данные пользователя
-        bridge.getUserInfo().then((userInfo) => {
-          const container = document.getElementById('user-info');
-          if (userInfo && userInfo.name) {
-            container.textContent = `Имя: ${userInfo.name}`;
-            container.className = ''; // убираем loading
-          } else if (userInfo) {
-            // Если имени нет, но объект есть — можно вывести ID
-            container.textContent = 'Имя не указано. ID пользователя: ' + userInfo.id;
+      document.getElementById('get-user-btn').addEventListener('click', () => {
+        const container = document.getElementById('user-info');
+        container.textContent = 'Загрузка данных…';
+        container.className = 'loading';
+
+        bridge.ready().then(() => {
+          return bridge.getUserInfo();
+        }).then((userInfo) => {
+          if (userInfo) {
+            let text = '';
+            if (userInfo.name) {
+              text += `Имя: ${userInfo.name}\n`;
+            } else {
+              text += 'Имя не указано\n';
+            }
+            if (userInfo.id) {
+              text += `ID: ${userInfo.id}`;
+            } else {
+              text += 'ID не указан';
+            }
+            container.textContent = text;
             container.className = '';
           } else {
             container.textContent = 'Не удалось получить данные пользователя.';
@@ -61,13 +85,9 @@
           }
         }).catch((err) => {
           console.error(err);
-          document.getElementById('user-info').textContent = 'Ошибка получения данных.';
-          document.getElementById('user-info').className = 'error';
+          container.textContent = 'Ошибка получения данных.';
+          container.className = 'error';
         });
-      }).catch((err) => {
-        console.error('MAX Bridge не готов:', err);
-        document.getElementById('user-info').textContent = 'MAX Bridge недоступен.';
-        document.getElementById('user-info').className = 'error';
       });
     </script>
   </body>
