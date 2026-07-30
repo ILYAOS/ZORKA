@@ -53,8 +53,8 @@
         }
         </script>
         <div class="buttons-container">
-         <button onclick="window.location.href = 'Events.html'">Просмотр событий</button>
-         <button onclick="handleAction('zadaniya')">Задания</button>
+         <button onclick=openFile('события')">Запланировано</button>
+         <button onclick="window.location.href = 'Events.html'">Задания</button>
          <button onclick="handleAction('reports')">Отчеты</button>
         <button onclick="openFile('about')">О программе</button>
       </div>
@@ -62,7 +62,7 @@
       <script>
         const files = {
         'about': 'https://disk.yandex.ru/i/vZnEmDqQd2bECw',
-        'МЕНЮ': 'https://disk.yandex.ru/i/ei_iPdH4ZJ502Q'
+        'события': 'https://disk.yandex.ru/i/XcD00OGG562KSg'
             };
          function handleAction(action) {
 
