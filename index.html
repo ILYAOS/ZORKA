@@ -3,96 +3,71 @@
   <head>
     <meta charset="utf-8" />
     <title>Зоренька — MAX MiniApp</title>
-    <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
-      body { font-family: Arial, sans-serif; padding: 20px; }
-      .buttons-container { display: flex; gap: 12px; flex-direction: column; }
-      button {
-        padding: 14px 20px;
-        font-size: 16px;
-        background-color: #ff9500; /* облепиховый цвет */
-        color: white;
+        button {
+        padding: 14px 16px;
         border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
         cursor: pointer;
-      }
-      #user-info { margin-top: 20px; font-weight: bold; }
+        color: #1a1a1a;
+        background-color: skyblue; /* небесноголубой */
+        transition: background-color 0.2s, transform 0.1s;
+      } 
     </style>
-  </head>
-  <body>
-    <h2>Зоренька</h2>
-   
-    <h2 id="user-id-name"></h2>
-     <script src="https://st.max.ru/js/max-web-app.js"></script>
-    <script src="https://st.max.ru/js/max-web-app.js"></script>
-<script>
-  if (window.WebApp) {
-    window.WebApp.ready();
 
-    // Проверяем, есть ли данные
-    const initDataUnsafe = window.WebApp.initDataUnsafe;
-    const user = initDataUnsafe?.user;
-    const chatM=initDataUnsafe?.id;
-    
-    if (user) {
-      const ggg = user.id;                 // ID пользователя
-           
-      const gg = user.first_name; 
-      // hash не берём из user — он в initData и проверяется на сервере
-      // Выводим на форму вместо заголовков с текстом
-      
-       
-      const e2 = document.getElementById('user-id-name');
-       e2.textContent = `Здравствуйте,  ${gg}`;
-      // Можно вывести и username, если нужно
-    } else {
-      console.warn('Данные пользователя недоступны — возможно, приложение запущено не в MAX');
-    }
-  } else {
-    console.error('WebApp не определён. Проверьте, что страница открыта в MAX и скрипт загружен.');
-  }
-</script>
+
+
+
+
+    </head>
   
-    <div class="buttons-container">
-      <button id="btn-menu">Меню</button>
-      <button id="btn-phones">Наши номера</button>
-      <button id="btn-sauna">Сауна</button>
-      <button id="btn-events">Анонс мероприятий</button>
-      <button id="btn-user">О пользователе</button>
-    </div>
+    <body>
 
-    <div id="user-info"></div>
-
-    <script>
-      if (window.WebApp) {
-        window.WebApp.ready();
-        // Опционально: развернуть на всю высоту
-        // window.WebApp.expand();
-      } else {
-        document.body.textContent = 'Приложение должно быть запущено внутри MAX.';
-        return;
-      }
-
-      
-
-      // Пример: открытие файла по кнопке (Яндекс Диск)
-      const links = {
-        'btn-menu': 'https://disk.yandex.ru/i/IYNKVFUQ-UUGPQ',
-        'btn-phones': 'ССЫЛКА_НА_ФАЙЛ_НОМЕРА',
-        'btn-sauna': 'ССЫЛКА_НА_ФАЙЛ_САУНА',
-        'btn-events': 'ССЫЛКА_НА_events.csv'
-      };
-
-      Object.keys(links).forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-          btn.addEventListener('click', () => {
-            const url = links[id];
-            if (url) {
-              window.WebApp.openLink(url); // откроет во внешнем браузере
+        <h1>Зоренька.</h1>
+        <h1 id="user-id-name"></h1>    
+        <script src="https://st.max.ru/js/max-web-app.js"></script>
+        <script>
+            //работа с МАХ
+            if (window.WebApp) {
+            window.WebApp.ready();
+            const initDataUnsafe = window.WebApp.initDataUnsafe;
+            const user = initDataUnsafe?.user;
+            if (user) {
+                const UserName = user.first_name; 
+                const UserID=user.id;
+                document.getElementById('user-id-name').textContent = `Здравствуйте, ${NameUser}`;}
+            else {
+            document.getElementById('user-id-name').textContent='Данные пользователя недоступны — возможно, приложение запущено не в MAX';
             }
-          });
+        } else {
+            document.getElementById('user-id-name').textContent='Данные пользователя недоступны — возможно, приложение запущено не в MAX';
         }
-      });
-    </script>
-  </body>
+        </script>
+        <div class="buttons-container">
+        <button onclick="handleAction('zadaniya')">Задания</button>
+        <button onclick="handleAction('meropriatiya')">Мероприятия</button>
+        <button onclick="handleAction('reports')">Отчеты</button>
+        <button onclick="openFile('about')">О программе</button>
+      </div>
+
+      <script>
+        const files = {
+        'about': 'https://disk.yandex.ru/i/vZnEmDqQd2bECw',
+        
+            };
+         function handleAction(action) {
+
+
+         }
+
+
+
+      </script>
+
+
+
+
+    </body>
 </html>
