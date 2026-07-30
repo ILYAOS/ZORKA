@@ -15,6 +15,13 @@
         background-color: skyblue; /* небесноголубой */
         transition: background-color 0.2s, transform 0.1s;
       } 
+      .buttons-container {
+        display: flex;
+        flex-direction: column;       /* КНОПКИ В СТОЛБИК */
+        gap: 12px;                    /* Расстояние между кнопками */
+        max-width: 320px;             /* Чтобы не растягивалось на весь экран */
+        margin: 0 auto;               /* По центру страницы */
+      }
     </style>
 
 
@@ -55,13 +62,27 @@
       <script>
         const files = {
         'about': 'https://disk.yandex.ru/i/vZnEmDqQd2bECw',
-        
+        'МЕНЮ': 'https://disk.yandex.ru/i/ei_iPdH4ZJ502Q'
             };
          function handleAction(action) {
 
 
          }
-
+        
+         function openFile(key) {
+            const url = files[key];
+            if (!url || url.includes('ВАША_ССЫЛКА')) {
+              alert('Ссылка на файл не настроена. Замените её в коде.');
+              return;
+            }
+            // MAX Bridge: открываем ссылку внутри среды MAX
+            if (window.max && window.max.openUrl) {
+              window.max.openUrl(url);
+            } else {
+              // Фоллбэк: если MAX Bridge не инициализирован — открываем в новой вкладке
+              window.open(url, '_blank');
+            }
+      }
 
 
       </script>
