@@ -122,12 +122,33 @@
         }
 
         // Загружаем данные при готовности документа
+        /* 
         document.addEventListener('DOMContentLoaded', () => {
             renderTable().catch(error => {
                 console.error('Ошибка при рендере таблицы:', error);
                 alert('Произошла ошибка при загрузке данных');
             });
         });
+*/
+        async function getText(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP ошибка! Статус: ${response.status}`);
+    }
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    console.error('Ошибка:', error);
+    throw error;
+  }
+}
+
+// Использование
+getText(url).then(data => {
+  // Работаем с текстом
+  console.log(data);
+});
     </script>
 </body>
 </html>
